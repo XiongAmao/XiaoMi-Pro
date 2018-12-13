@@ -1,107 +1,127 @@
-# XiaoMi NoteBook Pro for macOS High Sierra & Sierra
+# XiaoMi NoteBook Pro for macOS Mojave & High Sierra
 
 Hackintosh your XiaoMi Pro Notebook
 
-
+[English](README.md) | [中文](README-CN.md)
 
 ## Features
 
-* Support 10.13.x
-  * CPU native support
-  * video card fake support, platform-id is 0x19160000, injection information is loaded by /CLOVER/ACPI/patched/SSDT-Config.aml
-  * The sound card is ALC298, fake with AppleALC, layout-id is 99, injection information is located at `/CLOVER/ACPI/patched/SSDT-Config.aml`
-  * Touchpad driver using `VoodooI2C`, support for multiple gestures, touchpad boot can be used normally, no drift, no wakeup
-  * Other ACPI patch fixes using hotpatch mode, file located in `/CLOVER/ACPI/patched`
-  * USB shadowing using `/CLOVER/kexts/Other/USBInjectAll_patched.kext`
+* Support 10.13.x and 10.14.
+* ACPI fixes use hotpatch; related files are located in `/CLOVER/ACPI/patched`.
+
+### Audio
+* The model of the sound card is `Realtek ALC298`, which is drived by `AppleALC` on layout-id 99; injection information is located in `/CLOVER/config.plist`. 
+* If headphones are not working, please see [ALCPlugFix](https://github.com/daliansky/XiaoMi-Pro/tree/master/ALCPlugFix/README.md). You may need to replug headphone after every boot.
+* Some i5 devices may fail to drive microphone, please follow instructions in [#13](https://github.com/stevezhengshiqi/XiaoMi-Pro/issues/13).
+    
+### Bluetooth
+* Native Bluetooth is [not working well](https://github.com/daliansky/XiaoMi-Pro/issues/50). The model is `Intel® Dual Band Wireless-AC 8265`. There are two options you can do with it:
+    * Disable it to save power or use a BT dongle. Please read instructions here: [#24](https://github.com/daliansky/XiaoMi-Pro/issues/24).
+    * Buy and insert a supported wireless card in M.2 slot and carefully solder D+ and D- wires to the WLAN_LTE slot. After that, please replace the archive in [#7](https://github.com/stevezhengshiqi/XiaoMi-Pro/issues/7).
+
+### CPU
+* The model is `i5-8250U` or `i7-8550U`, and XCPM power management is native supported. 
+* XCPM and HWP are recommended to work together to reach better power management (>=10.13.6). Please replace `/CLOVER/kexts/Other/CPUFriendDataProvider.kext` with the archive in [#53](https://github.com/daliansky/XiaoMi-Pro/issues/53) to enable HWP.
+
+### Ethernet
+* The model name is `RTL8153`, and is natively supported by 10.13+.
+* This ethernet card is connected to USB port.
+
+### Graphics
+* The model name is `Intel UHD Graphics 620`, faked to `Intel HD Graphics 620` by injecting ig-platform-id `00001659`.
+* The discrete graphics' name is `NVIDIA GeForce MX150`, disabled by `SSDT-DDGPU.aml` becuase macOS doesn't support Optimus technology.
+* Use HDMI port on the left side may cause black internal display, please try to reopen the lid.
+* Native brightness hotkey support; related file is located in `/CLOVER/ACPI/patched/SSDT-LGPA.aml`.
+
+### Keyboard
+* Caps Lock may not function well, please read instructions in [#2](https://github.com/stevezhengshiqi/XiaoMi-Pro/issues/2) to uncheck `Use the Caps Lock key to switch to and from ABC`. 
+* The latest keyboard driver can temporily disable the touchpad during typing. If you are not happy with the lag, a workaround is provided in [#19](https://github.com/stevezhengshiqi/XiaoMi-Pro/issues/19).
+
+### SSD
+* Recent model uses `PM981` SSD instead of `PM961`. <b>This EFI doesn't fully support `PM981`, and `PM981` users can replace their SSDs</b> or visit [How to fix PM981 in 10.3.3](https://www.tonymacx86.com/threads/how-to-fix-pm981-in-10-13-3-17d47.245063)(Not working yet!) to see the progress.
+    * `PM981` SSD's serial number starts with `MZVLB`, and `PM961` SSD's serial number starts with `MZVLW`.
+
+### Touchpad
+* The model name is `ETD2303`(ELAN), and the driver is a patched verison of `VoodooI2C`, which has no scale problem or sleep issue.
+* Don't forget to uncheck `Smart Zoom` in `SysPref - Trackpad - Scroll & Zoom` to help trackpad work better.
+
+### USB
+* USB Port Patching uses [Intel FB-Patcher](https://www.tonymacx86.com/threads/release-intel-fb-patcher-v1-4-1.254559), related file is located in `/CLOVER/kexts/Other/USBPorts.kext`.
+* SD Card Reader's model name is `RTS5129`. It is not supported and be disabled to save power.
+
+### Wi-Fi
+* The wireless model is `Intel® Dual Band Wireless-AC 8265`. Unfortunately, there's no way to enable it. You can follow [Intel WiFi Driver Effort](https://www.tonymacx86.com/threads/intel-wifi-driver-effort.186344) to check the latest progress.
+* A workaround is to insert a supported wireless card into M.2 slot. More information can be viewed in [Xiaomi Mi Notebook Pro High Sierra 10.13.6](https://www.tonymacx86.com/threads/guide-xiaomi-mi-notebook-pro-high-sierra-10-13-6.242724).
 
 
+## FAQ
 
-## Credits
+### My device is locked by `Find My Mac` and can't be booted, what should I do now?
 
-- [RehabMan](https://github.com/RehabMan) Updated [OS-X-Clover-Laptop-Config](https://github.com/RehabMan/OS-X-Clover-Laptop-Config) and [Laptop-DSDT-Patch](https://github.com/RehabMan/Laptop-DSDT-Patch) and [patch-nvme](https://github.com/RehabMan/patch-nvme) and [OS-X-USB-Inject-All](https://github.com/RehabMan/OS-X-USB-Inject-All) for maintenance
-
-- [vit9696](https://github.com/vit9696) Updated [Lilu](https://github.com/vit9696/Lilu) and [AppleALC](https://github.com/vit9696/AppleALC) and [WhateverGreen](https://github.com/vit9696/WhateverGreen)  for maintenance
-
-- [Pike R. Alpha](https://github.com/Piker-Alpha) Updated [ssdtPRGen.sh](https://github.com/Piker-Alpha/ssdtPRGen.sh) and [AppleIntelInfo](https://github.com/Piker-Alpha/AppleIntelInfo) and [HandyScripts](https://github.com/Piker-Alpha/HandyScripts) for maintenance
-
-- [toleda](https://github.com/toleda), [Mirone](https://github.com/Mirone) and certain others for audio patches and layouts
+I believe there are many ways to solve this problem. I give a most understandable one here (at least for me). The solution is to refresh your BIOS in order to clean `nvram.plist`. Please read `How to update BIOS` in [BIOS folder](https://github.com/daliansky/XiaoMi-Pro/blob/master/BIOS/README.md).
 
 
+### I opened the `FileVault` and I can't find macOS partition in Clover boot page, how can I solve it?
+
+It is not recommened to open `FileVault`. You can press Fn + F3 in the Clover boot page and choose the icon with `FileVault`. Then you can boot in the system and close `FileVault`.
+
+
+### My touchpad isn't working after update.
+
+You need to rebuild the kext cache after every system update. Use `Kext Utility.app` or type `sudo kextcache -i /` in `Terminal.app`. Then restart. If this still doesn't work, try to press F9.
+
+
+### I can't boot in Windows/Linux by using Clover, but able to boot by press F12 and select OS.
+
+Many people met this problem by using the new version of `AptioMemoryFix.efi`. A workaround is to delete `AptioMemoryFix-64.efi` in `/CLOVER/drivers64UEFI/` and replace it with the old version provided in [#93](https://github.com/daliansky/XiaoMi-Pro/issues/93).
 
 
 ## Installation
 
-Please refer to the detailed installation tutorial (Chinese version) [macOS安装教程兼小米Pro安装过程记录](https://blog.daliansky.net/MacOS-installation-tutorial-XiaoMi-Pro-installation-process-records.html).
+Please refer to the detailed installation tutorial [Xiaomi Mi Notebook Pro High Sierra 10.13.6](https://www.tonymacx86.com/threads/guide-xiaomi-mi-notebook-pro-high-sierra-10-13-6.242724) or video tutorial [Xiaomi NoteBook PRO HACKINTOSH INSTALLATION GUIDE !!!](https://www.youtube.com/watch?v=72sPmkpxCvc).
 
-A complete EFI archive is available [releases](https://github.com/daliansky/XiaoMi-Pro/releases) page.
+A complete EFI archive is available in [releases](https://github.com/daliansky/XiaoMi-Pro/releases) page,Thanks to the continuous update of [stevezhengshiqi](https://github.com/stevezhengshiqi).
+
+If the tracpad doesn't work during installation, please plug a wired mouse or a wireless mouse projector before the installation. After the installation completes, open `Terminal.app` and type `sudo kextcache -i /`. Wait for the process ending and restart the device. Enjoy your trackpad!
 
 
+## Changelog
 
-## Change Log:
-
-- 10-14-2017
-   - EFI update, touch pad is working
-- 10-17-2017
-   - EFI update, fixed graphics driver
-   - Add HDMI Audio output
-   - Driver Update:
-     - Lilu v1.2.0
-     - AppleALC v1.2.1
-     - IntelGraphicsDVMTFixup v1.2.0
-     - AirportBrcmFixup v1.1.0
-   - Driver repair:
-     - IntelGraphicsFixup v1.2.0
-- 10-18-2017
-   - tested graphics driver is not as good as the first version, now the graphics driver is restored to fake 0x19160000
-   - ACPI repair
-       Driver fixes
-   - Remove USBInjectAll with SSDT-UIAL.aml built-in USB device
-- 10-19-2017
-   - Graphics driver is normal
-   - The touchpad turns on normally, multi-gestures are normal after waking up
-   - normal sleep
-   - Battery information is normal
-- 10-31-2017
-   - Update sound card driver, fix earphone problem
-   - New driver to increase layoutid: 13
-   - Supports four nodes to support the headset to switch freely, Mic / LineIn is working properly
-- 11-2-2017
-   - Lilu v1.2.0 update, support 10.13.2Beta
-   - AppleALC update, using the latest revision of Lilu co-compiler to solve 10.13.1 update can not be driven after the problem
-- 11-5-2017
-   - Integrate AppleALC_ALC298_id13_id28.kext driver to EFI
-   - Add EFL directory ALCPlugFix directory, please enter the ALCPlugFix directory after the installation is complete, double-click the install double-click to automatically install. Command Install the headset plug-in state correction daemon
-   - Fixed Drivers64UEFI to solve the problem that can not be installed
-   - Updated apfs.efi to version 10.13.1
-- 11-7-2017
-   - Lilu v1.2.1 is not stable at the moment, with the risk of inability to enter the system, so downgrade to v1.2.0
-   - AppleALC downgraded to V1.2.0
-       **EFI temporarily does not support macOS 10.13.2Beta version of the installation, Lilu does not exhaust will continue to update**
-- 1-25-2018
-   - Support for 10.13.x installation
-   - Updated VoodooI2C to version 2.0.1, supports multi-gestures, touchpad boot can be used normally, no drift, no wakeup
-   - Fixed the issue of percentage refreshes
-   - Fix sound card sleep wake up soundless problem
-   - Fixed screen brightness can not be saved problem
-   - Updated Lilu v1.2.2
-   - Updated AppleALC v1.2.2 support millet pro, injection ID: 99
-   - Update IntelGraphicsFixup v1.2.3
-
+You can view [Changelog](Changelog.md) for detailed information.
 
 
 ## A reward
 
-| Wechat                                   | Alipay                                   |
-| ---------------------------------------- | ---------------------------------------- |
-| ![wechatpay_160](http://ous2s14vo.bkt.clouddn.com/wechatpay_160.jpg) | ![alipay_160](http://ous2s14vo.bkt.clouddn.com/alipay_160.jpg) |
+All the project is made for free, but you can reward me if you want.
+
+| Wechat                                                     | Alipay                                               |
+| ---------------------------------------------------------- | ---------------------------------------------------- |
+| ![wechatpay_160](http://7.daliansky.net/wechatpay_160.jpg) | ![alipay_160](http://7.daliansky.net/alipay_160.jpg) |
+
+
+## Credits
+
+- Thanks to [Acidanthera](https://github.com/acidanthera) for providing [AppleALC](https://github.com/acidanthera/AppleALC), [CPUFriend](https://github.com/acidanthera/CPUFriend), [HibernationFixup](https://github.com/acidanthera/HibernationFixup), [Lilu](https://github.com/acidanthera/Lilu), `USBPorts`, [VirtualSMC](https://github.com/acidanthera/VirtualSMC), and [WhateverGreen](https://github.com/acidanthera/WhateverGreen).
+
+- Thanks to [alexandred](https://github.com/alexandred) and [hieplpvip](https://github.com/hieplpvip) for providing [VoodooI2C](https://github.com/alexandred/VoodooI2C).
+
+- Thanks to [apianti](https://sourceforge.net/u/apianti), [blackosx](https://sourceforge.net/u/blackosx), [blusseau](https://sourceforge.net/u/blusseau), [dmazar](https://sourceforge.net/u/dmazar), and [slice2009](https://sourceforge.net/u/slice2009) for providing [Clover](https://sourceforge.net/projects/cloverefiboot).
+
+- Thanks to [FallenChromium](https://github.com/FallenChromium), [Javmain](https://github.com/javmain), and [johnnync13](https://github.com/johnnync13) for valuable suggestions.
+
+- Thanks to [hieplpvip](https://github.com/hieplpvip) and [syscl](https://github.com/syscl) for providing sample of DSDT patches.
+
+- Thanks to [RehabMan](https://github.com/RehabMan) for providing [AppleBacklightFixup](https://github.com/RehabMan/AppleBacklightFixup), [EAPD-Codec-Commander](https://github.com/RehabMan/EAPD-Codec-Commander), [OS-X-Clover-Laptop-Config](https://github.com/RehabMan/OS-X-Clover-Laptop-Config), [OS-X-Voodoo-PS2-Controller](https://github.com/RehabMan/OS-X-Voodoo-PS2-Controller), and [SATA-unsupported](https://github.com/RehabMan/hack-tools/tree/master/kexts/SATA-unsupported.kext).
+
 
 ## Support and discussion
 
-- QQ群:
+- tonymacx86.com:
+  - [[Guide] Xiaomi Mi Notebook Pro High Sierra 10.13.6](https://www.tonymacx86.com/threads/guide-xiaomi-mi-notebook-pro-high-sierra-10-13-6.242724)
+
+- QQ:
   - 247451054 [小米PRO黑苹果高级群](http://shang.qq.com/wpa/qunwpa?idkey=6223ea12a7f7efe58d5972d241000dd59cbd0260db2fdede52836ca220f7f20e)
+  - 137188006 [小米PRO黑苹果](http://shang.qq.com/wpa/qunwpa?idkey=c17e190b9466a73cf12e8caec36e87124fce9e231a895353ee817e9921fdd74e)
   - 331686786 [一起吃苹果](http://shang.qq.com/wpa/qunwpa?idkey=db511a29e856f37cbb871108ffa77a6e79dde47e491b8f2c8d8fe4d3c310de91)
-  - 688324116 [一起黑苹果](https://shang.qq.com/wpa/qunwpa?idkey=6bf69a6f4b983dce94ab42e439f02195dfd19a1601522c10ad41f4df97e0da82)[群已满,请加其它群]
+  - 688324116 [一起黑苹果](https://shang.qq.com/wpa/qunwpa?idkey=6bf69a6f4b983dce94ab42e439f02195dfd19a1601522c10ad41f4df97e0da82)
   - 257995340 [一起啃苹果](http://shang.qq.com/wpa/qunwpa?idkey=8a63c51acb2bb80184d788b9f419ffcc33aa1ed2080132c82173a3d881625be8)
-
-
-
